@@ -1,0 +1,600 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="light dark" />
+<link rel="icon" href="data:," />
+<title>毎日の体調記録フォーム</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#fff6f0;
+  --bg2:#ffeef3;
+  --card:#ffffff;
+  --card-soft:#fff9f5;
+  --ink:#5b3a44;
+  --ink-soft:#9a6b7a;
+  --ink-faint:#c08a9a;
+  --pink:#ff8fab;
+  --pink-deep:#fb6f92;
+  --pink-soft:#ffe0e9;
+  --pink-pale:#fff0f3;
+  --cream:#fff3d6;
+  --peach:#ffb38a;
+  --mint:#a8dcc8;
+  --line:#ffd6e0;
+  --shadow:0 8px 28px rgba(251,111,146,.14);
+  --shadow-sm:0 3px 12px rgba(251,111,146,.10);
+  --radius:24px;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#2a1e24;
+    --bg2:#332028;
+    --card:#3d2931;
+    --card-soft:#463039;
+    --ink:#ffe8ee;
+    --ink-soft:#d8a7b5;
+    --ink-faint:#a97a89;
+    --pink:#ff8fab;
+    --pink-deep:#fb7a9e;
+    --pink-soft:#5a3542;
+    --pink-pale:#4a2d38;
+    --cream:#5a4a2a;
+    --line:#5f3d49;
+    --shadow:0 8px 28px rgba(0,0,0,.35);
+    --shadow-sm:0 3px 12px rgba(0,0,0,.3);
+  }
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  font-family:"M PLUS Rounded 1c", system-ui, -apple-system, sans-serif;
+  background:
+    radial-gradient(circle at 12% 8%, var(--pink-soft) 0, transparent 180px),
+    radial-gradient(circle at 88% 22%, var(--cream) 0, transparent 160px),
+    linear-gradient(180deg, var(--bg2) 0%, var(--bg) 340px);
+  color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+  padding-bottom:48px;
+}
+.wrap{max-width:560px;margin:0 auto;padding:0 16px}
+
+/* header */
+.hero{ text-align:center; padding:28px 8px 8px; position:relative; }
+.hero-deco{ font-size:22px; letter-spacing:10px; opacity:.85; }
+.hero h1{
+  margin:10px 0 4px;
+  font-size:32px; line-height:1.25; font-weight:800; letter-spacing:.02em;
+}
+.hero h1 .accent{ color:var(--pink-deep); }
+.hero-date{
+  display:inline-block; margin-top:8px;
+  background:var(--card); border:2px solid var(--line);
+  color:var(--ink-soft); font-weight:700; font-size:14px;
+  padding:7px 16px; border-radius:999px; box-shadow:var(--shadow-sm);
+}
+.hero-sub{ margin:12px auto 0; font-size:14px; line-height:1.7; color:var(--ink-soft); max-width:340px; }
+
+/* streak */
+.streak{
+  margin:18px 0 4px;
+  background:linear-gradient(135deg, #fff, var(--pink-pale));
+  border:2px solid var(--line); border-radius:var(--radius);
+  padding:14px 16px; display:flex; align-items:center; gap:14px; box-shadow:var(--shadow-sm);
+}
+@media (prefers-color-scheme: dark){ .streak{ background:linear-gradient(135deg, var(--card), var(--pink-pale)); } }
+.streak-flame{
+  width:52px;height:52px;flex:0 0 52px;border-radius:50%;
+  background:var(--pink-soft); display:grid; place-items:center; font-size:26px;
+  border:2px dashed var(--pink);
+}
+.streak-num{ font-size:26px; font-weight:800; color:var(--pink-deep); line-height:1; }
+.streak-num small{ font-size:14px; color:var(--ink); }
+.streak-text{ font-size:13px; color:var(--ink-soft); line-height:1.5; margin-top:3px; font-weight:500; }
+
+/* cards */
+.card{
+  background:var(--card); border:2px solid var(--line); border-radius:var(--radius);
+  padding:18px 16px 16px; margin-top:16px; box-shadow:var(--shadow-sm);
+}
+.card-head{ display:flex; align-items:center; gap:10px; margin-bottom:14px; }
+.card-icon{
+  width:40px;height:40px;border-radius:14px; display:grid; place-items:center; font-size:20px; flex:0 0 40px;
+}
+.icon-pink{ background:var(--pink-soft); }
+.icon-cream{ background:var(--cream); }
+.icon-peach{ background:#ffe4d3; }
+.icon-mint{ background:#dff3ea; }
+@media (prefers-color-scheme: dark){
+  .icon-peach{ background:#5a4030; } .icon-mint{ background:#2f4a3f; }
+}
+.card-head h2{ margin:0; font-size:17px; font-weight:800; }
+.card-head p{ margin:1px 0 0; font-size:12px; color:var(--ink-soft); font-weight:500; }
+
+.field{ margin-bottom:12px; }
+.field:last-child{ margin-bottom:0; }
+.field label{
+  display:block; font-size:13px; font-weight:700; color:var(--ink-soft); margin:0 0 6px 4px;
+}
+.time-row{ display:flex; gap:10px; }
+.time-box{ flex:1; }
+input[type="time"], input[type="text"], textarea{
+  width:100%; font-family:inherit; font-size:16px; font-weight:700; color:var(--ink);
+  background:var(--card-soft); border:2px solid var(--line); border-radius:16px;
+  padding:12px 14px; min-height:52px; outline:none; transition:border-color .15s, box-shadow .15s;
+  -webkit-appearance:none; appearance:none;
+}
+input[type="text"]::placeholder, textarea::placeholder{ color:var(--ink-faint); font-weight:500; font-size:14px; }
+input:focus, textarea:focus{ border-color:var(--pink); box-shadow:0 0 0 4px var(--pink-soft); background:var(--card); }
+textarea{ min-height:88px; resize:vertical; line-height:1.6; font-weight:500; }
+.quick-row{ display:flex; flex-wrap:wrap; gap:6px; margin-top:7px; }
+.chip{
+  border:2px solid var(--line); background:var(--card); color:var(--ink-soft);
+  font-family:inherit; font-size:12px; font-weight:700; border-radius:999px; padding:7px 12px; min-height:36px; cursor:pointer;
+}
+.chip:active{ background:var(--pink-soft); border-color:var(--pink); color:var(--ink); }
+
+/* itch radios */
+.itch-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.itch-opt{ position:relative; display:block; cursor:pointer; }
+.itch-opt input{
+  position:absolute; top:10px; left:50%; transform:translateX(-50%);
+  width:22px; height:22px; min-height:22px; margin:0; cursor:pointer; z-index:2;
+  accent-color:var(--pink-deep);
+}
+.itch-face{
+  display:flex; flex-direction:column; align-items:center; gap:2px;
+  border:2.5px solid var(--line); background:var(--card-soft); border-radius:18px;
+  padding:36px 8px 12px; text-align:center; transition:all .15s; min-height:104px; justify-content:center;
+}
+.itch-face .face{ font-size:30px; line-height:1; }
+.itch-face .lbl{ font-size:14px; font-weight:800; }
+.itch-face .sub{ font-size:11px; color:var(--ink-soft); font-weight:500; }
+.itch-opt input:checked + .itch-face{
+  border-color:var(--pink-deep); background:var(--pink-pale);
+  box-shadow:0 0 0 4px var(--pink-soft); transform:scale(1.02);
+}
+.itch-opt input:focus-visible + .itch-face{ outline:3px solid var(--pink); outline-offset:2px; }
+
+/* submit */
+.submit-area{ margin-top:22px; text-align:center; }
+.btn-submit{
+  width:100%; border:none; cursor:pointer; font-family:inherit;
+  background:linear-gradient(135deg, var(--pink) 0%, var(--pink-deep) 100%);
+  color:#fff; font-size:18px; font-weight:800; letter-spacing:.04em;
+  padding:17px 20px; border-radius:999px; min-height:60px;
+  box-shadow:0 10px 24px rgba(251,111,146,.38);
+  transition:transform .12s, opacity .12s;
+}
+.btn-submit:active{ transform:scale(.97); }
+.btn-submit:disabled{ opacity:.6; }
+.submit-note{ font-size:12px; color:var(--ink-soft); margin-top:10px; font-weight:500; }
+
+/* success */
+.success{ display:none; text-align:center; padding:36px 10px 8px; }
+.success.show{ display:block; }
+.success-emoji{ font-size:64px; line-height:1; animation:bounce 1s ease infinite alternate; display:inline-block; }
+@keyframes bounce{ from{ transform:translateY(0) rotate(-4deg);} to{ transform:translateY(-10px) rotate(4deg);} }
+@media (prefers-reduced-motion: reduce){ .success-emoji{ animation:none; } .heart-fall{ animation:none !important; display:none; } }
+.success h2{ font-size:26px; font-weight:800; margin:14px 0 6px; }
+.success p{ color:var(--ink-soft); font-size:14px; line-height:1.8; margin:0 auto; max-width:320px; font-weight:500; }
+.praise{
+  display:inline-block; margin-top:16px; background:var(--pink-pale); border:2px dashed var(--pink);
+  color:var(--ink); font-weight:800; font-size:15px; padding:12px 20px; border-radius:999px;
+}
+.btn-again{
+  margin-top:22px; border:2px solid var(--pink); background:var(--card); color:var(--pink-deep);
+  font-family:inherit; font-weight:800; font-size:15px; border-radius:999px; padding:13px 28px; min-height:52px; cursor:pointer; width:100%;
+}
+.heart-fall{
+  position:fixed; top:-30px; pointer-events:none; z-index:50; font-size:20px;
+  animation:fall linear forwards;
+}
+@keyframes fall{ to{ transform:translateY(105vh) rotate(320deg); opacity:.2; } }
+
+/* history */
+.history-head{ display:flex; align-items:baseline; justify-content:space-between; margin:30px 2px 4px; }
+.history-head h2{ font-size:19px; font-weight:800; margin:0; }
+.history-count{ font-size:12px; color:var(--ink-soft); font-weight:700; }
+.day-card{
+  background:var(--card); border:2px solid var(--line); border-radius:20px;
+  padding:14px 16px; margin-top:10px; box-shadow:var(--shadow-sm);
+}
+.day-top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+.day-date{ font-weight:800; font-size:15px; }
+.day-itch{ font-size:12px; font-weight:800; background:var(--pink-pale); color:var(--pink-deep); border-radius:999px; padding:4px 11px; }
+@media (prefers-color-scheme: dark){ .day-itch{ color:var(--pink); } }
+.day-grid{ display:grid; grid-template-columns:1fr 1fr; gap:5px 14px; font-size:13px; }
+.day-grid div{ display:flex; gap:6px; line-height:1.5; }
+.day-grid .k{ color:var(--ink-soft); font-weight:700; flex:0 0 auto; }
+.day-grid .v{ font-weight:500; word-break:break-all; }
+.day-note{ margin-top:7px; font-size:13px; line-height:1.6; background:var(--card-soft); border-radius:12px; padding:8px 11px; font-weight:500; }
+.empty-history{
+  text-align:center; color:var(--ink-soft); font-size:13px; font-weight:500; line-height:1.8;
+  border:2px dashed var(--line); border-radius:20px; padding:22px 16px; margin-top:10px; background:var(--card);
+}
+.footer-note{ text-align:center; font-size:11px; color:var(--ink-faint); margin-top:34px; font-weight:500; line-height:1.7; }
+.form-wrap.hidden{ display:none; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div class="hero-deco" aria-hidden="true">♡ ✿ ♡</div>
+    <h1>きょうの<span class="accent">体調記録</span> 🌷</h1>
+    <div><span class="hero-date" id="todayLabel">…</span></div>
+    <p class="hero-sub">ねむり・ごはん・おふろ・かゆみを、<br>ちょこっとだけ教えてね。空っぽでも大丈夫だよ。</p>
+  </header>
+
+  <div class="streak" id="streakBox">
+    <div class="streak-flame" aria-hidden="true">🔥</div>
+    <div>
+      <div class="streak-num"><span id="streakNum">0</span><small> 日連続で記録中！</small></div>
+      <div class="streak-text" id="streakText">今日の分を書くと、記録がスタートするよ 🌱</div>
+    </div>
+  </div>
+
+  <!-- ===== フォーム ===== -->
+  <div class="form-wrap" id="formWrap">
+    <form id="recordForm" novalidate>
+
+      <section class="card">
+        <div class="card-head">
+          <div class="card-icon icon-pink" aria-hidden="true">🌙</div>
+          <div><h2>ねむり</h2><p>だいたいの時刻でOKだよ</p></div>
+        </div>
+        <div class="time-row">
+          <div class="time-box field">
+            <label for="bedtime">ねた時刻</label>
+            <input type="time" id="bedtime" name="bedtime">
+          </div>
+          <div class="time-box field">
+            <label for="waketime">起きた時刻</label>
+            <input type="time" id="waketime" name="waketime">
+          </div>
+        </div>
+        <div class="field" style="margin-top:10px">
+          <label>ねむりの感じ（タップで時刻を入れられるよ）</label>
+          <div class="quick-row">
+            <button type="button" class="chip" data-fill="bedtime" data-value="23:00">ねた 23:00</button>
+            <button type="button" class="chip" data-fill="bedtime" data-value="00:00">ねた 0:00</button>
+            <button type="button" class="chip" data-fill="bedtime" data-value="01:00">ねた 1:00</button>
+            <button type="button" class="chip" data-fill="waketime" data-value="07:00">起きた 7:00</button>
+            <button type="button" class="chip" data-fill="waketime" data-value="08:00">起きた 8:00</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-head">
+          <div class="card-icon icon-cream" aria-hidden="true">🍚</div>
+          <div><h2>ごはん</h2><p>食べたものを短く書いてね</p></div>
+        </div>
+        <div class="field">
+          <label for="breakfast">🌅 朝ごはん</label>
+          <input type="text" id="breakfast" name="breakfast" placeholder="例：トーストとヨーグルト" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="lunch">☀️ 昼ごはん</label>
+          <input type="text" id="lunch" name="lunch" placeholder="例：パスタ" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="dinner">🌙 夜ごはん</label>
+          <input type="text" id="dinner" name="dinner" placeholder="例：お鍋" autocomplete="off">
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-head">
+          <div class="card-icon icon-peach" aria-hidden="true">🛁</div>
+          <div><h2>おふろ</h2><p>入った時刻を教えてね</p></div>
+        </div>
+        <div class="field">
+          <label for="bathtime">入浴時刻</label>
+          <input type="time" id="bathtime" name="bathtime">
+        </div>
+        <div class="quick-row">
+          <button type="button" class="chip" data-fill="bathtime" data-value="20:00">20:00</button>
+          <button type="button" class="chip" data-fill="bathtime" data-value="21:00">21:00</button>
+          <button type="button" class="chip" data-fill="bathtime" data-value="22:00">22:00</button>
+          <button type="button" class="chip" data-fill="bathtime" data-value="23:00">23:00</button>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-head">
+          <div class="card-icon icon-mint" aria-hidden="true">🌿</div>
+          <div><h2>かゆみ</h2><p>いつもと比べてどうだった？</p></div>
+        </div>
+        <div class="itch-grid" role="radiogroup" aria-label="痒みはいつもと比べてどうでしたか">
+          <label class="itch-opt">
+            <input type="radio" name="itch" value="強かった">
+            <span class="itch-face"><span class="face">😣</span><span class="lbl">強かった</span><span class="sub">つらかったね</span></span>
+          </label>
+          <label class="itch-opt">
+            <input type="radio" name="itch" value="ふつう">
+            <span class="itch-face"><span class="face">😐</span><span class="lbl">ふつう</span><span class="sub">いつもどおり</span></span>
+          </label>
+          <label class="itch-opt">
+            <input type="radio" name="itch" value="弱かった">
+            <span class="itch-face"><span class="face">🙂</span><span class="lbl">弱かった</span><span class="sub">わりと楽だった</span></span>
+          </label>
+          <label class="itch-opt">
+            <input type="radio" name="itch" value="ほとんどなかった">
+            <span class="itch-face"><span class="face">😊</span><span class="lbl">ほとんどなかった</span><span class="sub">調子いいね！</span></span>
+          </label>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-head">
+          <div class="card-icon icon-pink" aria-hidden="true">✏️</div>
+          <div><h2>備考</h2><p>気づいたことがあれば（任意）</p></div>
+        </div>
+        <div class="field">
+          <textarea id="notes" name="notes" placeholder="例：今日はよく眠れた、薬を塗り忘れた、など"></textarea>
+        </div>
+      </section>
+
+      <div class="submit-area">
+        <button type="submit" class="btn-submit" id="submitBtn">記録する ♡</button>
+        <div class="submit-note">空欄があっても送信できるよ。そのまま押してね。</div>
+      </div>
+    </form>
+  </div>
+
+  <!-- ===== 完了画面 ===== -->
+  <div class="success" id="successView" aria-live="polite">
+    <span class="success-emoji" aria-hidden="true">🐰</span>
+    <h2>記録できたよ！</h2>
+    <p>今日の分、ちゃんと届いたよ。<br>毎日続けてくれてありがとう。</p>
+    <div><span class="praise" id="praiseText">えらい！その調子 ♡</span></div>
+    <button type="button" class="btn-again" id="againBtn">フォームに戻る</button>
+  </div>
+
+  <!-- ===== 履歴 ===== -->
+  <div class="history-head">
+    <h2>📖 今までの記録</h2>
+    <span class="history-count" id="historyCount"></span>
+  </div>
+  <div id="historyList"></div>
+
+  <p class="footer-note">このページの記録は、この端末の中にも残るよ。<br>送信した内容は体調記録としてまとめられます。</p>
+</div>
+
+<script>
+(function(){
+  var FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSfdxini9zGpRRn6u4dAXgbX9deywMphb-uU6gcQkNLTrDKsKQ/formResponse';
+  var LS_KEY = 'taicho-records-v1';
+  var WEEK = ['日','月','火','水','木','金','土'];
+  var PRAISES = [
+    'えらい！その調子 ♡',
+    '今日も記録できたね、すごい！🌸',
+    'コツコツ続けてて本当にえらい ✨',
+    '自分の体を大事にしてるね、素敵 💗',
+    'おつかれさま、今日もよく頑張ったね 🐰'
+  ];
+
+  function jstNow(){
+    // JST基準の現在日時文字列を取得
+    var parts = new Intl.DateTimeFormat('en-CA', {
+      timeZone:'Asia/Tokyo', year:'numeric', month:'2-digit', day:'2-digit',
+      weekday:'short', hour:'2-digit', minute:'2-digit', hour12:false
+    }).formatToParts(new Date());
+    var o = {};
+    parts.forEach(function(p){ o[p.type]=p.value; });
+    return o;
+  }
+  function todayKey(){
+    var o = jstNow();
+    return o.year + '-' + o.month + '-' + o.day;
+  }
+  function todayLabel(){
+    var o = jstNow();
+    var wdMap = {Sun:0,Mon:1,Tue:2,Wed:3,Thu:4,Fri:5,Sat:6};
+    var wd = WEEK[wdMap[o.weekday] || 0];
+    return parseInt(o.month,10) + '月' + parseInt(o.day,10) + '日（' + wd + '）';
+  }
+  function fmtDateLabel(key){
+    var p = key.split('-');
+    if(p.length!==3) return key;
+    var d = new Date(parseInt(p[0],10), parseInt(p[1],10)-1, parseInt(p[2],10));
+    return parseInt(p[1],10) + '月' + parseInt(p[2],10) + '日（' + WEEK[d.getDay()] + '）';
+  }
+  function shiftKey(key, delta){
+    var p = key.split('-');
+    var d = new Date(parseInt(p[0],10), parseInt(p[1],10)-1, parseInt(p[2],10));
+    d.setDate(d.getDate()+delta);
+    var m = ('0'+(d.getMonth()+1)).slice(-2), dd = ('0'+d.getDate()).slice(-2);
+    return d.getFullYear() + '-' + m + '-' + dd;
+  }
+
+  function loadRecords(){
+    try{
+      var raw = localStorage.getItem(LS_KEY);
+      var arr = raw ? JSON.parse(raw) : [];
+      return Array.isArray(arr) ? arr : [];
+    }catch(e){ return []; }
+  }
+  function saveRecords(arr){
+    try{ localStorage.setItem(LS_KEY, JSON.stringify(arr)); }catch(e){}
+  }
+
+  function calcStreak(records){
+    var dates = {};
+    records.forEach(function(r){ if(r && r.date) dates[r.date]=true; });
+    var t = todayKey();
+    var cursor = dates[t] ? t : shiftKey(t,-1);
+    if(!dates[cursor]) return 0;
+    var n = 0;
+    while(dates[cursor]){ n++; cursor = shiftKey(cursor,-1); }
+    return n;
+  }
+
+  function esc(s){
+    return String(s==null?'':s).replace(/[&<>"']/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+
+  function renderHistory(){
+    var records = loadRecords();
+    var streak = calcStreak(records);
+    document.getElementById('streakNum').textContent = streak;
+    var st = document.getElementById('streakText');
+    if(streak >= 7) st.textContent = '1週間以上続いてる！本当にすごいよ 🎉';
+    else if(streak >= 3) st.textContent = 'いいペースだね、この調子でいこう 🌸';
+    else if(streak >= 1) st.textContent = '記録が続いてるよ、えらいね 🌱';
+    else st.textContent = '今日の分を書くと、記録がスタートするよ 🌱';
+
+    var list = document.getElementById('historyList');
+    var count = document.getElementById('historyCount');
+    if(!records.length){
+      count.textContent = '';
+      list.innerHTML = '<div class="empty-history">まだ記録がないよ。<br>今日の分を書くと、ここに残るよ 🐾</div>';
+      return;
+    }
+    count.textContent = '全 ' + records.length + ' 件';
+    var sorted = records.slice().sort(function(a,b){
+      return (b.date + (b.savedAt||'')).localeCompare(a.date + (a.savedAt||''));
+    });
+    var html = '';
+    sorted.forEach(function(r){
+      html += '<div class="day-card"><div class="day-top"><span class="day-date">' + esc(fmtDateLabel(r.date)) + '</span>'
+        + (r.itch ? '<span class="day-itch">かゆみ：' + esc(r.itch) + '</span>' : '')
+        + '</div><div class="day-grid">';
+      var rows = [
+        ['🌙 ねた', r.bedtime], ['☀️ 起きた', r.waketime],
+        ['🌅 朝', r.breakfast], ['🍱 昼', r.lunch],
+        ['🌙 夜', r.dinner], ['🛁 おふろ', r.bathtime]
+      ];
+      var any = false;
+      rows.forEach(function(row){
+        if(row[1]){ any = true; html += '<div><span class="k">' + row[0] + '</span><span class="v">' + esc(row[1]) + '</span></div>'; }
+      });
+      if(!any) html += '<div><span class="v" style="color:var(--ink-soft)">（この日はメモだけの記録だよ）</span></div>';
+      html += '</div>';
+      if(r.notes) html += '<div class="day-note">📝 ' + esc(r.notes) + '</div>';
+      html += '</div>';
+    });
+    list.innerHTML = html;
+  }
+
+  // 日付ラベル
+  document.getElementById('todayLabel').textContent = todayLabel() + ' の記録';
+
+  // クイック入力チップ
+  document.querySelectorAll('.chip[data-fill]').forEach(function(chip){
+    chip.addEventListener('click', function(){
+      var target = document.getElementById(chip.getAttribute('data-fill'));
+      if(target){ target.value = chip.getAttribute('data-value'); target.focus(); }
+    });
+  });
+
+  function splitTime(v){
+    if(!v) return null;
+    var p = v.split(':');
+    if(p.length<2) return null;
+    return { hour: String(parseInt(p[0],10)), minute: String(parseInt(p[1],10)) };
+  }
+
+  var form = document.getElementById('recordForm');
+  form.addEventListener('submit', function(ev){
+    ev.preventDefault();
+    var btn = document.getElementById('submitBtn');
+    if(btn.disabled) return;
+    btn.disabled = true;
+    btn.textContent = '送信中… ♡';
+
+    var bedtime = document.getElementById('bedtime').value;
+    var waketime = document.getElementById('waketime').value;
+    var breakfast = document.getElementById('breakfast').value.trim();
+    var lunch = document.getElementById('lunch').value.trim();
+    var dinner = document.getElementById('dinner').value.trim();
+    var bathtime = document.getElementById('bathtime').value;
+    var notes = document.getElementById('notes').value.trim();
+    var itchEl = form.querySelector('input[name="itch"]:checked');
+    var itch = itchEl ? itchEl.value : '';
+
+    // Googleフォームへ送信
+    var params = new URLSearchParams();
+    var bt = splitTime(bedtime);
+    if(bt){ params.append('entry.1346526521_hour', bt.hour); params.append('entry.1346526521_minute', bt.minute); }
+    var wt = splitTime(waketime);
+    if(wt){ params.append('entry.1383552942_hour', wt.hour); params.append('entry.1383552942_minute', wt.minute); }
+    if(breakfast) params.append('entry.1886603140', breakfast);
+    if(lunch) params.append('entry.1673192626', lunch);
+    if(dinner) params.append('entry.650651930', dinner);
+    var bath = splitTime(bathtime);
+    if(bath){ params.append('entry.177732940_hour', bath.hour); params.append('entry.177732940_minute', bath.minute); }
+    if(itch) params.append('entry.1138608139', itch);
+    if(notes) params.append('entry.1870937493', notes);
+
+    function finish(){
+      // 端末内にも保存
+      var records = loadRecords();
+      records.push({
+        date: todayKey(),
+        savedAt: new Date().toISOString(),
+        bedtime: bedtime || '', waketime: waketime || '',
+        breakfast: breakfast, lunch: lunch, dinner: dinner,
+        bathtime: bathtime || '', itch: itch, notes: notes
+      });
+      saveRecords(records);
+      renderHistory();
+
+      // 完了画面
+      document.getElementById('praiseText').textContent = PRAISES[Math.floor(Math.random()*PRAISES.length)];
+      document.getElementById('formWrap').classList.add('hidden');
+      var sv = document.getElementById('successView');
+      sv.classList.add('show');
+      sv.scrollIntoView({ behavior:'smooth', block:'start' });
+      dropHearts();
+      btn.disabled = false;
+      btn.textContent = '記録する ♡';
+    }
+
+    fetch(FORM_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: params.toString()
+    }).then(finish).catch(finish);
+  });
+
+  function dropHearts(){
+    if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    var chars = ['♡','🌸','✨','💗','🎀'];
+    for(var i=0;i<18;i++){
+      (function(i){
+        var s = document.createElement('span');
+        s.className = 'heart-fall';
+        s.textContent = chars[i % chars.length];
+        s.style.left = (Math.random()*94) + 'vw';
+        s.style.fontSize = (14 + Math.random()*16) + 'px';
+        s.style.animationDuration = (1.6 + Math.random()*1.6) + 's';
+        s.style.animationDelay = (Math.random()*0.5) + 's';
+        document.body.appendChild(s);
+        setTimeout(function(){ s.remove(); }, 4200);
+      })(i);
+    }
+  }
+
+  document.getElementById('againBtn').addEventListener('click', function(){
+    form.reset();
+    document.getElementById('successView').classList.remove('show');
+    document.getElementById('formWrap').classList.remove('hidden');
+    window.scrollTo({ top:0, behavior:'smooth' });
+  });
+
+  renderHistory();
+})();
+</script>
+</body>
+</html>
