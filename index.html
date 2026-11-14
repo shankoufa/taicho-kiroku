@@ -139,6 +139,27 @@ textarea{ min-height:88px; resize:vertical; line-height:1.6; font-weight:500; }
 }
 .chip:active{ background:var(--pink-soft); border-color:var(--pink); color:var(--ink); }
 
+/* shift radios */
+.shift-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.shift-opt{ position:relative; display:block; cursor:pointer; }
+.shift-opt input{
+  position:absolute; top:8px; left:50%; transform:translateX(-50%);
+  width:20px; height:20px; min-height:20px; margin:0; cursor:pointer; z-index:2;
+  accent-color:var(--pink-deep);
+}
+.shift-face{
+  display:flex; flex-direction:column; align-items:center; gap:2px;
+  border:2.5px solid var(--line); background:var(--card-soft); border-radius:18px;
+  padding:32px 8px 10px; text-align:center; transition:all .15s; min-height:84px; justify-content:center;
+}
+.shift-face .face{ font-size:26px; line-height:1; }
+.shift-face .lbl{ font-size:14px; font-weight:800; }
+.shift-opt input:checked + .shift-face{
+  border-color:var(--pink-deep); background:var(--pink-pale);
+  box-shadow:0 0 0 4px var(--pink-soft); transform:scale(1.02);
+}
+.shift-opt input:focus-visible + .shift-face{ outline:3px solid var(--pink); outline-offset:2px; }
+
 /* itch radios */
 .itch-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
 .itch-opt{ position:relative; display:block; cursor:pointer; }
@@ -209,6 +230,9 @@ textarea{ min-height:88px; resize:vertical; line-height:1.6; font-weight:500; }
 .day-date{ font-weight:800; font-size:15px; }
 .day-itch{ font-size:12px; font-weight:800; background:var(--pink-pale); color:var(--pink-deep); border-radius:999px; padding:4px 11px; }
 @media (prefers-color-scheme: dark){ .day-itch{ color:var(--pink); } }
+.day-badges{ display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end; }
+.day-shift{ font-size:12px; font-weight:800; background:#dff3ea; color:#3d7a63; border-radius:999px; padding:4px 11px; }
+@media (prefers-color-scheme: dark){ .day-shift{ background:#2f4a3f; color:var(--mint); } }
 .day-grid{ display:grid; grid-template-columns:1fr 1fr; gap:5px 14px; font-size:13px; }
 .day-grid div{ display:flex; gap:6px; line-height:1.5; }
 .day-grid .k{ color:var(--ink-soft); font-weight:700; flex:0 0 auto; }
@@ -233,16 +257,41 @@ textarea{ min-height:88px; resize:vertical; line-height:1.6; font-weight:500; }
   </header>
 
   <div class="streak" id="streakBox">
-    <div class="streak-flame" aria-hidden="true">🔥</div>
+    <div class="streak-flame" aria-hidden="true">🌸</div>
     <div>
-      <div class="streak-num"><span id="streakNum">0</span><small> 日連続で記録中！</small></div>
-      <div class="streak-text" id="streakText">今日の分を書くと、記録がスタートするよ 🌱</div>
+      <div class="streak-num"><small>今月の記録 </small><span id="monthNum">0</span><small> 日</small></div>
+      <div class="streak-text" id="monthText">夜勤の日は無理しなくて大丈夫だよ。書ける日に、書ける分だけでOK 🌷</div>
     </div>
   </div>
 
   <!-- ===== フォーム ===== -->
   <div class="form-wrap" id="formWrap">
     <form id="recordForm" novalidate>
+
+      <section class="card">
+        <div class="card-head">
+          <div class="card-icon icon-mint" aria-hidden="true">🧑‍⚕️</div>
+          <div><h2>今日の勤務</h2><p>今日はどんな日だった？（任意だよ）</p></div>
+        </div>
+        <div class="shift-grid" role="radiogroup" aria-label="今日の勤務">
+          <label class="shift-opt">
+            <input type="radio" name="shift" value="日勤">
+            <span class="shift-face"><span class="face">☀️</span><span class="lbl">日勤</span></span>
+          </label>
+          <label class="shift-opt">
+            <input type="radio" name="shift" value="夜勤">
+            <span class="shift-face"><span class="face">🌙</span><span class="lbl">夜勤</span></span>
+          </label>
+          <label class="shift-opt">
+            <input type="radio" name="shift" value="夜勤明け">
+            <span class="shift-face"><span class="face">🌅</span><span class="lbl">夜勤明け</span></span>
+          </label>
+          <label class="shift-opt">
+            <input type="radio" name="shift" value="お休み">
+            <span class="shift-face"><span class="face">🏠</span><span class="lbl">お休み</span></span>
+          </label>
+        </div>
+      </section>
 
       <section class="card">
         <div class="card-head">
@@ -407,14 +456,6 @@ textarea{ min-height:88px; resize:vertical; line-height:1.6; font-weight:500; }
     var d = new Date(parseInt(p[0],10), parseInt(p[1],10)-1, parseInt(p[2],10));
     return parseInt(p[1],10) + '月' + parseInt(p[2],10) + '日（' + WEEK[d.getDay()] + '）';
   }
-  function shiftKey(key, delta){
-    var p = key.split('-');
-    var d = new Date(parseInt(p[0],10), parseInt(p[1],10)-1, parseInt(p[2],10));
-    d.setDate(d.getDate()+delta);
-    var m = ('0'+(d.getMonth()+1)).slice(-2), dd = ('0'+d.getDate()).slice(-2);
-    return d.getFullYear() + '-' + m + '-' + dd;
-  }
-
   function loadRecords(){
     try{
       var raw = localStorage.getItem(LS_KEY);
@@ -426,15 +467,15 @@ textarea{ min-height:88px; resize:vertical; line-height:1.6; font-weight:500; }
     try{ localStorage.setItem(LS_KEY, JSON.stringify(arr)); }catch(e){}
   }
 
-  function calcStreak(records){
-    var dates = {};
-    records.forEach(function(r){ if(r && r.date) dates[r.date]=true; });
-    var t = todayKey();
-    var cursor = dates[t] ? t : shiftKey(t,-1);
-    if(!dates[cursor]) return 0;
-    var n = 0;
-    while(dates[cursor]){ n++; cursor = shiftKey(cursor,-1); }
-    return n;
+  function calcMonthlyCount(records){
+    // 今月（JST）記録した「日数」を数える。連続でなくても減らない数え方
+    var o = jstNow();
+    var prefix = o.year + '-' + o.month + '-';
+    var days = {};
+    records.forEach(function(r){
+      if(r && r.date && r.date.indexOf(prefix) === 0) days[r.date] = true;
+    });
+    return Object.keys(days).length;
   }
 
   function esc(s){
@@ -445,13 +486,13 @@ textarea{ min-height:88px; resize:vertical; line-height:1.6; font-weight:500; }
 
   function renderHistory(){
     var records = loadRecords();
-    var streak = calcStreak(records);
-    document.getElementById('streakNum').textContent = streak;
-    var st = document.getElementById('streakText');
-    if(streak >= 7) st.textContent = '1週間以上続いてる！本当にすごいよ 🎉';
-    else if(streak >= 3) st.textContent = 'いいペースだね、この調子でいこう 🌸';
-    else if(streak >= 1) st.textContent = '記録が続いてるよ、えらいね 🌱';
-    else st.textContent = '今日の分を書くと、記録がスタートするよ 🌱';
+    var monthCount = calcMonthlyCount(records);
+    document.getElementById('monthNum').textContent = monthCount;
+    var mt = document.getElementById('monthText');
+    if(monthCount >= 20) mt.textContent = '今月もたくさん記録できたね、すごい！夜勤の日は無理しなくて大丈夫だよ 🌷';
+    else if(monthCount >= 10) mt.textContent = '今月もコツコツ記録できてるね。夜勤の日は無理しなくて大丈夫だよ 🌷';
+    else if(monthCount >= 1) mt.textContent = '夜勤の日は無理しなくて大丈夫だよ。書ける日に、書ける分だけでOK 🌷';
+    else mt.textContent = '夜勤の日は無理しなくて大丈夫だよ。今月の最初の記録を書いてみてね 🌱';
 
     var list = document.getElementById('historyList');
     var count = document.getElementById('historyCount');
@@ -467,8 +508,10 @@ textarea{ min-height:88px; resize:vertical; line-height:1.6; font-weight:500; }
     var html = '';
     sorted.forEach(function(r){
       html += '<div class="day-card"><div class="day-top"><span class="day-date">' + esc(fmtDateLabel(r.date)) + '</span>'
+        + '<span class="day-badges">'
+        + (r.shift ? '<span class="day-shift">' + esc(r.shift) + '</span>' : '')
         + (r.itch ? '<span class="day-itch">かゆみ：' + esc(r.itch) + '</span>' : '')
-        + '</div><div class="day-grid">';
+        + '</span></div><div class="day-grid">';
       var rows = [
         ['🌙 ねた', r.bedtime], ['☀️ 起きた', r.waketime],
         ['🌅 朝', r.breakfast], ['🍱 昼', r.lunch],
@@ -521,9 +564,12 @@ textarea{ min-height:88px; resize:vertical; line-height:1.6; font-weight:500; }
     var notes = document.getElementById('notes').value.trim();
     var itchEl = form.querySelector('input[name="itch"]:checked');
     var itch = itchEl ? itchEl.value : '';
+    var shiftEl = form.querySelector('input[name="shift"]:checked');
+    var shift = shiftEl ? shiftEl.value : '';
 
     // Googleフォームへ送信
     var params = new URLSearchParams();
+    if(shift) params.append('entry.1383573100', shift);
     var bt = splitTime(bedtime);
     if(bt){ params.append('entry.1346526521_hour', bt.hour); params.append('entry.1346526521_minute', bt.minute); }
     var wt = splitTime(waketime);
@@ -542,6 +588,7 @@ textarea{ min-height:88px; resize:vertical; line-height:1.6; font-weight:500; }
       records.push({
         date: todayKey(),
         savedAt: new Date().toISOString(),
+        shift: shift,
         bedtime: bedtime || '', waketime: waketime || '',
         breakfast: breakfast, lunch: lunch, dinner: dinner,
         bathtime: bathtime || '', itch: itch, notes: notes
