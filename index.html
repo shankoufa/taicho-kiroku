@@ -123,6 +123,10 @@ body{
 }
 .time-row{ display:flex; gap:10px; }
 .time-box{ flex:1; }
+.sleep-label{ display:flex; align-items:baseline; gap:8px; font-size:13px; font-weight:800; color:var(--ink); margin:2px 0 8px 4px; }
+.sleep-label span{ font-size:11px; font-weight:500; color:var(--ink-soft); }
+.nap-box{ margin-top:16px; padding-top:14px; border-top:2px dashed var(--line); }
+.nap-note{ font-size:12px; color:var(--ink-soft); font-weight:500; line-height:1.6; margin:8px 0 0 4px; }
 input[type="time"], input[type="text"], textarea{
   width:100%; font-family:inherit; font-size:16px; font-weight:700; color:var(--ink);
   background:var(--card-soft); border:2px solid var(--line); border-radius:16px;
@@ -237,6 +241,7 @@ textarea{ min-height:88px; resize:vertical; line-height:1.6; font-weight:500; }
 .day-grid div{ display:flex; gap:6px; line-height:1.5; }
 .day-grid .k{ color:var(--ink-soft); font-weight:700; flex:0 0 auto; }
 .day-grid .v{ font-weight:500; word-break:break-all; }
+.day-nap{ margin-top:7px; font-size:13px; line-height:1.6; background:var(--pink-pale); border-radius:12px; padding:8px 11px; font-weight:700; color:var(--ink); }
 .day-note{ margin-top:7px; font-size:13px; line-height:1.6; background:var(--card-soft); border-radius:12px; padding:8px 11px; font-weight:500; }
 .empty-history{
   text-align:center; color:var(--ink-soft); font-size:13px; font-weight:500; line-height:1.8;
@@ -253,7 +258,7 @@ textarea{ min-height:88px; resize:vertical; line-height:1.6; font-weight:500; }
     <div class="hero-deco" aria-hidden="true">♡ ✿ ♡</div>
     <h1>きょうの<span class="accent">体調記録</span> 🌷</h1>
     <div><span class="hero-date" id="todayLabel">…</span></div>
-    <p class="hero-sub">ねむり・ごはん・おふろ・かゆみを、<br>ちょこっとだけ教えてね。空っぽでも大丈夫だよ。</p>
+    <p class="hero-sub">毎晩、寝る前にちょこっとだけ教えてね。<br>ねむり・ごはん・おふろ・かゆみ。空っぽでも大丈夫だよ。</p>
   </header>
 
   <div class="streak" id="streakBox">
@@ -298,6 +303,7 @@ textarea{ min-height:88px; resize:vertical; line-height:1.6; font-weight:500; }
           <div class="card-icon icon-pink" aria-hidden="true">🌙</div>
           <div><h2>ねむり</h2><p>だいたいの時刻でOKだよ</p></div>
         </div>
+        <div class="sleep-label">🌙 メインの睡眠 <span>一番長く寝る睡眠はここに</span></div>
         <div class="time-row">
           <div class="time-box field">
             <label for="bedtime">ねた時刻</label>
@@ -311,12 +317,32 @@ textarea{ min-height:88px; resize:vertical; line-height:1.6; font-weight:500; }
         <div class="field" style="margin-top:10px">
           <label>ねむりの感じ（タップで時刻を入れられるよ）</label>
           <div class="quick-row">
-            <button type="button" class="chip" data-fill="bedtime" data-value="23:00">ねた 23:00</button>
+            <button type="button" class="chip" data-fill="bedtime" data-value="12:00">ねた 12:00</button>
             <button type="button" class="chip" data-fill="bedtime" data-value="00:00">ねた 0:00</button>
             <button type="button" class="chip" data-fill="bedtime" data-value="01:00">ねた 1:00</button>
             <button type="button" class="chip" data-fill="waketime" data-value="07:00">起きた 7:00</button>
             <button type="button" class="chip" data-fill="waketime" data-value="08:00">起きた 8:00</button>
           </div>
+        </div>
+        <div class="nap-box">
+          <div class="sleep-label">💤 仮眠 <span>夜勤中の仮眠など・任意だよ</span></div>
+          <div class="time-row">
+            <div class="time-box field">
+              <label for="napstart">仮眠をはじめた時刻</label>
+              <input type="time" id="napstart" name="napstart">
+            </div>
+            <div class="time-box field">
+              <label for="napend">仮眠から起きた時刻</label>
+              <input type="time" id="napend" name="napend">
+            </div>
+          </div>
+          <div class="quick-row">
+            <button type="button" class="chip" data-fill="napstart" data-value="12:00">仮眠 12:00〜</button>
+            <button type="button" class="chip" data-fill="napstart" data-value="13:00">仮眠 13:00〜</button>
+            <button type="button" class="chip" data-fill="napend" data-value="17:00">起きた 17:00</button>
+            <button type="button" class="chip" data-fill="napend" data-value="18:00">起きた 18:00</button>
+          </div>
+          <p class="nap-note">夜勤の日は、夜の勤務中の仮眠をここに書いてね。仕事が終わってお昼に寝るのがメインの睡眠だから、それは上の「メインの睡眠」に書いてね。仮眠しなかった日は空っぽでOKだよ。</p>
         </div>
       </section>
 
@@ -521,8 +547,19 @@ textarea{ min-height:88px; resize:vertical; line-height:1.6; font-weight:500; }
       rows.forEach(function(row){
         if(row[1]){ any = true; html += '<div><span class="k">' + row[0] + '</span><span class="v">' + esc(row[1]) + '</span></div>'; }
       });
+      var napStartVal = r.napStart || r.napstart || '';
+      var napEndVal = r.napEnd || r.napend || '';
+      var hasNap = !!(napStartVal || napEndVal);
+      if(hasNap) any = true;
       if(!any) html += '<div><span class="v" style="color:var(--ink-soft)">（この日はメモだけの記録だよ）</span></div>';
       html += '</div>';
+      if(hasNap){
+        var napText = '';
+        if(napStartVal && napEndVal) napText = napStartVal + '〜' + napEndVal;
+        else if(napStartVal) napText = napStartVal + '〜';
+        else napText = '〜' + napEndVal;
+        html += '<div class="day-nap">💤 仮眠： ' + esc(napText) + '</div>';
+      }
       if(r.notes) html += '<div class="day-note">📝 ' + esc(r.notes) + '</div>';
       html += '</div>';
     });
@@ -557,6 +594,10 @@ textarea{ min-height:88px; resize:vertical; line-height:1.6; font-weight:500; }
 
     var bedtime = document.getElementById('bedtime').value;
     var waketime = document.getElementById('waketime').value;
+    var napstartEl = document.getElementById('napstart');
+    var napendEl = document.getElementById('napend');
+    var napstart = napstartEl ? napstartEl.value : '';
+    var napend = napendEl ? napendEl.value : '';
     var breakfast = document.getElementById('breakfast').value.trim();
     var lunch = document.getElementById('lunch').value.trim();
     var dinner = document.getElementById('dinner').value.trim();
@@ -574,6 +615,10 @@ textarea{ min-height:88px; resize:vertical; line-height:1.6; font-weight:500; }
     if(bt){ params.append('entry.1346526521_hour', bt.hour); params.append('entry.1346526521_minute', bt.minute); }
     var wt = splitTime(waketime);
     if(wt){ params.append('entry.1383552942_hour', wt.hour); params.append('entry.1383552942_minute', wt.minute); }
+    var ns = splitTime(napstart);
+    if(ns){ params.append('entry.1061209262_hour', ns.hour); params.append('entry.1061209262_minute', ns.minute); }
+    var ne = splitTime(napend);
+    if(ne){ params.append('entry.83942154_hour', ne.hour); params.append('entry.83942154_minute', ne.minute); }
     if(breakfast) params.append('entry.1886603140', breakfast);
     if(lunch) params.append('entry.1673192626', lunch);
     if(dinner) params.append('entry.650651930', dinner);
@@ -590,6 +635,7 @@ textarea{ min-height:88px; resize:vertical; line-height:1.6; font-weight:500; }
         savedAt: new Date().toISOString(),
         shift: shift,
         bedtime: bedtime || '', waketime: waketime || '',
+        napStart: napstart || '', napEnd: napend || '',
         breakfast: breakfast, lunch: lunch, dinner: dinner,
         bathtime: bathtime || '', itch: itch, notes: notes
       });
