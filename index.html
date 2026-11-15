@@ -127,6 +127,20 @@ body{
 .sleep-label span{ font-size:11px; font-weight:500; color:var(--ink-soft); }
 .nap-box{ margin-top:16px; padding-top:14px; border-top:2px dashed var(--line); }
 .nap-note{ font-size:12px; color:var(--ink-soft); font-weight:500; line-height:1.6; margin:8px 0 0 4px; }
+.bath-note{
+  font-size:13px; font-weight:700; line-height:1.7; color:var(--ink-soft);
+  background:var(--pink-pale); border-radius:14px; padding:10px 12px; margin:0 0 14px;
+}
+.bath-note strong{ color:var(--pink-deep); }
+.bath-praise{
+  display:none; margin-top:12px; text-align:center;
+  background:linear-gradient(135deg, var(--pink-pale), var(--cream));
+  border:2px dashed var(--pink); border-radius:16px;
+  padding:12px 14px; font-size:15px; font-weight:800; line-height:1.6; color:var(--ink);
+}
+.bath-praise.show{ display:block; animation:bathPop .35s ease; }
+@keyframes bathPop{ from{ transform:scale(.96); opacity:0; } to{ transform:scale(1); opacity:1; } }
+@media (prefers-reduced-motion: reduce){ .bath-praise.show{ animation:none; } }
 input[type="time"], input[type="text"], textarea{
   width:100%; font-family:inherit; font-size:16px; font-weight:700; color:var(--ink);
   background:var(--card-soft); border:2px solid var(--line); border-radius:16px;
@@ -370,6 +384,7 @@ textarea{ min-height:88px; resize:vertical; line-height:1.6; font-weight:500; }
           <div class="card-icon icon-peach" aria-hidden="true">🛁</div>
           <div><h2>おふろ</h2><p>入った時刻を教えてね</p></div>
         </div>
+        <p class="bath-note">入れた日は<strong>えらい！</strong>入らなかった日も<strong>全然大丈夫</strong>だよ。疲れてる日は無理しないでね。入れた日だけ、時刻を書いてくれたら嬉しいな 🛁</p>
         <div class="field">
           <label for="bathtime">入浴時刻</label>
           <input type="time" id="bathtime" name="bathtime">
@@ -380,6 +395,7 @@ textarea{ min-height:88px; resize:vertical; line-height:1.6; font-weight:500; }
           <button type="button" class="chip" data-fill="bathtime" data-value="22:00">22:00</button>
           <button type="button" class="chip" data-fill="bathtime" data-value="23:00">23:00</button>
         </div>
+        <div class="bath-praise" id="bathPraise" role="status" aria-live="polite">🛁✨ おふろ入れたんだね、えらい！すごい！<br>ちゃんと自分の体を大事にできてて本当に素敵だよ ♡</div>
       </section>
 
       <section class="card">
@@ -577,6 +593,22 @@ textarea{ min-height:88px; resize:vertical; line-height:1.6; font-weight:500; }
     });
   });
 
+  // おふろ：時刻が入ったらその場で褒める（消したら褒め言葉も消える）
+  var bathInput = document.getElementById('bathtime');
+  var bathPraise = document.getElementById('bathPraise');
+  function updateBathPraise(){
+    if(!bathInput || !bathPraise) return;
+    if(bathInput.value){ bathPraise.classList.add('show'); }
+    else{ bathPraise.classList.remove('show'); }
+  }
+  if(bathInput){
+    bathInput.addEventListener('input', updateBathPraise);
+    bathInput.addEventListener('change', updateBathPraise);
+  }
+  document.querySelectorAll('.chip[data-fill="bathtime"]').forEach(function(chip){
+    chip.addEventListener('click', function(){ setTimeout(updateBathPraise, 0); });
+  });
+
   function splitTime(v){
     if(!v) return null;
     var p = v.split(':');
@@ -681,6 +713,7 @@ textarea{ min-height:88px; resize:vertical; line-height:1.6; font-weight:500; }
 
   document.getElementById('againBtn').addEventListener('click', function(){
     form.reset();
+    updateBathPraise();
     document.getElementById('successView').classList.remove('show');
     document.getElementById('formWrap').classList.remove('hidden');
     window.scrollTo({ top:0, behavior:'smooth' });
