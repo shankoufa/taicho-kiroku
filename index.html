@@ -127,6 +127,38 @@ body{
 .sleep-label span{ font-size:11px; font-weight:500; color:var(--ink-soft); }
 .nap-box{ margin-top:16px; padding-top:14px; border-top:2px dashed var(--line); }
 .nap-note{ font-size:12px; color:var(--ink-soft); font-weight:500; line-height:1.6; margin:8px 0 0 4px; }
+.auto-note{
+  font-size:13px; font-weight:700; line-height:1.7; color:var(--ink-soft);
+  background:var(--pink-pale); border-radius:14px; padding:10px 12px; margin:14px 0 0;
+}
+.auto-note strong{ color:var(--pink-deep); }
+.auto-note .auto-time{ color:var(--ink); font-size:15px; }
+.nap-len-wrap{ display:none; margin-top:12px; }
+.nap-len-wrap.show{ display:block; }
+.nap-hours-row{ display:flex; align-items:center; gap:10px; }
+.nap-hours-row input{ flex:1; text-align:center; }
+.nap-hours-unit{ font-size:15px; font-weight:800; color:var(--ink); flex:0 0 auto; }
+
+/* nap radios */
+.nap-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.nap-opt{ position:relative; display:block; cursor:pointer; }
+.nap-opt input{
+  position:absolute; top:8px; left:50%; transform:translateX(-50%);
+  width:20px; height:20px; min-height:20px; margin:0; cursor:pointer; z-index:2;
+  accent-color:var(--pink-deep);
+}
+.nap-face{
+  display:flex; flex-direction:column; align-items:center; gap:2px;
+  border:2.5px solid var(--line); background:var(--card-soft); border-radius:18px;
+  padding:32px 8px 10px; text-align:center; transition:all .15s; min-height:84px; justify-content:center;
+}
+.nap-face .face{ font-size:26px; line-height:1; }
+.nap-face .lbl{ font-size:14px; font-weight:800; }
+.nap-opt input:checked + .nap-face{
+  border-color:var(--pink-deep); background:var(--pink-pale);
+  box-shadow:0 0 0 4px var(--pink-soft); transform:scale(1.02);
+}
+.nap-opt input:focus-visible + .nap-face{ outline:3px solid var(--pink); outline-offset:2px; }
 .bath-note{
   font-size:13px; font-weight:700; line-height:1.7; color:var(--ink-soft);
   background:var(--pink-pale); border-radius:14px; padding:10px 12px; margin:0 0 14px;
@@ -141,7 +173,7 @@ body{
 .bath-praise.show{ display:block; animation:bathPop .35s ease; }
 @keyframes bathPop{ from{ transform:scale(.96); opacity:0; } to{ transform:scale(1); opacity:1; } }
 @media (prefers-reduced-motion: reduce){ .bath-praise.show{ animation:none; } }
-input[type="time"], input[type="text"], textarea{
+input[type="time"], input[type="text"], input[type="number"], textarea{
   width:100%; font-family:inherit; font-size:16px; font-weight:700; color:var(--ink);
   background:var(--card-soft); border:2px solid var(--line); border-radius:16px;
   padding:12px 14px; min-height:52px; outline:none; transition:border-color .15s, box-shadow .15s;
@@ -256,6 +288,10 @@ textarea{ min-height:88px; resize:vertical; line-height:1.6; font-weight:500; }
 .day-grid .k{ color:var(--ink-soft); font-weight:700; flex:0 0 auto; }
 .day-grid .v{ font-weight:500; word-break:break-all; }
 .day-nap{ margin-top:7px; font-size:13px; line-height:1.6; background:var(--pink-pale); border-radius:12px; padding:8px 11px; font-weight:700; color:var(--ink); }
+.day-sleep{ margin-top:7px; font-size:13px; line-height:1.6; background:#dff3ea; border-radius:12px; padding:8px 11px; font-weight:700; color:var(--ink); }
+@media (prefers-color-scheme: dark){ .day-sleep{ background:#2f4a3f; } }
+.success-bed{ margin-top:10px; font-size:14px; font-weight:800; color:var(--pink-deep); }
+@media (prefers-color-scheme: dark){ .success-bed{ color:var(--pink); } }
 .day-note{ margin-top:7px; font-size:13px; line-height:1.6; background:var(--card-soft); border-radius:12px; padding:8px 11px; font-weight:500; }
 .empty-history{
   text-align:center; color:var(--ink-soft); font-size:13px; font-weight:500; line-height:1.8;
@@ -263,6 +299,8 @@ textarea{ min-height:88px; resize:vertical; line-height:1.6; font-weight:500; }
 }
 .footer-note{ text-align:center; font-size:11px; color:var(--ink-faint); margin-top:34px; font-weight:500; line-height:1.7; }
 .form-wrap.hidden{ display:none; }
+.card.catchup-card{ background:var(--pink-pale); border:2.5px dashed var(--pink); }
+.day-prevbed{ margin-top:7px; font-size:13px; line-height:1.6; background:var(--cream); border-radius:12px; padding:8px 11px; font-weight:700; color:var(--ink); }
 </style>
 </head>
 <body>
@@ -272,7 +310,7 @@ textarea{ min-height:88px; resize:vertical; line-height:1.6; font-weight:500; }
     <div class="hero-deco" aria-hidden="true">♡ ✿ ♡</div>
     <h1>きょうの<span class="accent">体調記録</span> 🌷</h1>
     <div><span class="hero-date" id="todayLabel">…</span></div>
-    <p class="hero-sub">毎晩、寝る前にちょこっとだけ教えてね。<br>ねむり・ごはん・おふろ・かゆみ。空っぽでも大丈夫だよ。</p>
+    <p class="hero-sub">毎晩、寝る前にちょこっとだけ教えてね。<br>書くのは今日のことだけ。起きた時刻・ごはん・おふろ・かゆみ。ねる時刻は自分で書いてね。寝る前なら、寝る予定の時刻でOKだよ。</p>
   </header>
 
   <div class="streak" id="streakBox">
@@ -286,6 +324,26 @@ textarea{ min-height:88px; resize:vertical; line-height:1.6; font-weight:500; }
   <!-- ===== フォーム ===== -->
   <div class="form-wrap" id="formWrap">
     <form id="recordForm" novalidate>
+
+      <section class="card catchup-card" id="catchupCard" style="display:none">
+        <div class="card-head">
+          <div class="card-icon icon-pink" aria-hidden="true">🌙</div>
+          <div><h2>昨日のねた時刻</h2><p>昨日の記録がなかったみたい</p></div>
+        </div>
+        <p class="bath-note">寝落ちしちゃった日も<strong>全然大丈夫</strong>だよ。昨日何時に寝たか、覚えてたら教えてね。今日の睡眠時間を計算するのに使うよ。わからなかったら空欄でOK 🌙</p>
+        <div class="sleep-label">🌙 <span id="catchupDateLabel">昨日</span> 寝た時刻</div>
+        <div class="field">
+          <label for="prevBedtime">昨日の就寝時刻</label>
+          <input type="time" id="prevBedtime" name="prevBedtime">
+        </div>
+        <div class="quick-row">
+          <button type="button" class="chip" data-fill="prevBedtime" data-value="23:00">23:00</button>
+          <button type="button" class="chip" data-fill="prevBedtime" data-value="00:00">0:00</button>
+          <button type="button" class="chip" data-fill="prevBedtime" data-value="01:00">1:00</button>
+          <button type="button" class="chip" data-fill="prevBedtime" data-value="02:00">2:00</button>
+          <button type="button" class="chip" data-fill="prevBedtime" data-value="03:00">3:00</button>
+        </div>
+      </section>
 
       <section class="card">
         <div class="card-head">
@@ -315,48 +373,63 @@ textarea{ min-height:88px; resize:vertical; line-height:1.6; font-weight:500; }
       <section class="card">
         <div class="card-head">
           <div class="card-icon icon-pink" aria-hidden="true">🌙</div>
-          <div><h2>ねむり</h2><p>だいたいの時刻でOKだよ</p></div>
+          <div><h2>ねむり</h2><p>今日のことだけ書けばOKだよ</p></div>
         </div>
-        <div class="sleep-label">🌙 メインの睡眠 <span>一番長く寝る睡眠はここに</span></div>
-        <div class="time-row">
-          <div class="time-box field">
-            <label for="bedtime">ねた時刻</label>
-            <input type="time" id="bedtime" name="bedtime">
-          </div>
-          <div class="time-box field">
-            <label for="waketime">起きた時刻</label>
-            <input type="time" id="waketime" name="waketime">
-          </div>
+        <div class="sleep-label">☀️ 今日起きた時刻 <span>メインの睡眠から起きた時刻</span></div>
+        <div class="field">
+          <label for="waketime">起きた時刻</label>
+          <input type="time" id="waketime" name="waketime">
         </div>
-        <div class="field" style="margin-top:10px">
-          <label>ねむりの感じ（タップで時刻を入れられるよ）</label>
-          <div class="quick-row">
-            <button type="button" class="chip" data-fill="bedtime" data-value="12:00">ねた 12:00</button>
-            <button type="button" class="chip" data-fill="bedtime" data-value="00:00">ねた 0:00</button>
-            <button type="button" class="chip" data-fill="bedtime" data-value="01:00">ねた 1:00</button>
-            <button type="button" class="chip" data-fill="waketime" data-value="07:00">起きた 7:00</button>
-            <button type="button" class="chip" data-fill="waketime" data-value="08:00">起きた 8:00</button>
-          </div>
+        <div class="quick-row">
+          <button type="button" class="chip" data-fill="waketime" data-value="06:00">6:00</button>
+          <button type="button" class="chip" data-fill="waketime" data-value="07:00">7:00</button>
+          <button type="button" class="chip" data-fill="waketime" data-value="08:00">8:00</button>
+          <button type="button" class="chip" data-fill="waketime" data-value="12:00">12:00</button>
+          <button type="button" class="chip" data-fill="waketime" data-value="17:00">17:00</button>
+          <button type="button" class="chip" data-fill="waketime" data-value="18:00">18:00</button>
         </div>
+        <div class="sleep-label" style="margin-top:16px">🌙 今日寝る時刻 <span>寝る前なら予定でOK</span></div>
+        <div class="field">
+          <label for="bedtime">寝る時刻（予定でもOK）</label>
+          <input type="time" id="bedtime" name="bedtime">
+        </div>
+        <div class="quick-row">
+          <button type="button" class="chip" data-fill="bedtime" data-value="22:00">22:00</button>
+          <button type="button" class="chip" data-fill="bedtime" data-value="23:00">23:00</button>
+          <button type="button" class="chip" data-fill="bedtime" data-value="00:00">0:00</button>
+          <button type="button" class="chip" data-fill="bedtime" data-value="01:00">1:00</button>
+          <button type="button" class="chip" data-fill="bedtime" data-value="02:00">2:00</button>
+        </div>
+        <p class="auto-note">🌙 寝る前に書くときは、<strong>寝る予定の時刻</strong>を書いてね。もう寝たあとに書くときは、実際に寝た時刻で大丈夫だよ。睡眠時間は、この時刻と次の日の起きた時刻から計算するね。</p>
         <div class="nap-box">
-          <div class="sleep-label">💤 仮眠 <span>夜勤中の仮眠など・任意だよ</span></div>
-          <div class="time-row">
-            <div class="time-box field">
-              <label for="napstart">仮眠をはじめた時刻</label>
-              <input type="time" id="napstart" name="napstart">
+          <div class="sleep-label">💤 昼寝・仮眠 <span>今日した？・任意だよ</span></div>
+          <div class="nap-grid" role="radiogroup" aria-label="今日、昼寝や仮眠をしたか">
+            <label class="nap-opt">
+              <input type="radio" name="napdid" value="no">
+              <span class="nap-face"><span class="face">🙂</span><span class="lbl">してない</span></span>
+            </label>
+            <label class="nap-opt">
+              <input type="radio" name="napdid" value="yes">
+              <span class="nap-face"><span class="face">💤</span><span class="lbl">した</span></span>
+            </label>
+          </div>
+          <div class="nap-len-wrap" id="napLenWrap">
+            <div class="field">
+              <label for="naphours">だいたい何時間くらい寝た？</label>
+              <div class="nap-hours-row">
+                <input type="number" id="naphours" name="naphours" inputmode="decimal" step="0.5" min="0" max="24" placeholder="例：1.5">
+                <span class="nap-hours-unit">時間くらい</span>
+              </div>
             </div>
-            <div class="time-box field">
-              <label for="napend">仮眠から起きた時刻</label>
-              <input type="time" id="napend" name="napend">
+            <div class="quick-row">
+              <button type="button" class="chip" data-nap="0.5">30分くらい</button>
+              <button type="button" class="chip" data-nap="1">1時間くらい</button>
+              <button type="button" class="chip" data-nap="1.5">1時間半くらい</button>
+              <button type="button" class="chip" data-nap="2">2時間くらい</button>
+              <button type="button" class="chip" data-nap="3">3時間くらい</button>
             </div>
           </div>
-          <div class="quick-row">
-            <button type="button" class="chip" data-fill="napstart" data-value="12:00">仮眠 12:00〜</button>
-            <button type="button" class="chip" data-fill="napstart" data-value="13:00">仮眠 13:00〜</button>
-            <button type="button" class="chip" data-fill="napend" data-value="17:00">起きた 17:00</button>
-            <button type="button" class="chip" data-fill="napend" data-value="18:00">起きた 18:00</button>
-          </div>
-          <p class="nap-note">夜勤の日は、夜の勤務中の仮眠をここに書いてね。仕事が終わってお昼に寝るのがメインの睡眠だから、それは上の「メインの睡眠」に書いてね。仮眠しなかった日は空っぽでOKだよ。</p>
+          <p class="nap-note">夜勤の日は、勤務中の仮眠をここに書いてね。仕事が終わってお昼に寝るのがメインの睡眠だから、起きた時刻は上に書いてね。仮眠しなかった日は「してない」でOKだよ。</p>
         </div>
       </section>
 
@@ -435,7 +508,7 @@ textarea{ min-height:88px; resize:vertical; line-height:1.6; font-weight:500; }
 
       <div class="submit-area">
         <button type="submit" class="btn-submit" id="submitBtn">記録する ♡</button>
-        <div class="submit-note">空欄があっても送信できるよ。そのまま押してね。</div>
+        <div class="submit-note">「ねた時刻」は上で書いた時刻で記録するよ。空欄があっても送信できるよ。</div>
       </div>
     </form>
   </div>
@@ -445,6 +518,7 @@ textarea{ min-height:88px; resize:vertical; line-height:1.6; font-weight:500; }
     <span class="success-emoji" aria-hidden="true">🐰</span>
     <h2>記録できたよ！</h2>
     <p>今日の分、ちゃんと届いたよ。<br>毎日続けてくれてありがとう。</p>
+    <div class="success-bed" id="successBed"></div>
     <div><span class="praise" id="praiseText">えらい！その調子 ♡</span></div>
     <button type="button" class="btn-again" id="againBtn">フォームに戻る</button>
   </div>
@@ -498,6 +572,94 @@ textarea{ min-height:88px; resize:vertical; line-height:1.6; font-weight:500; }
     var d = new Date(parseInt(p[0],10), parseInt(p[1],10)-1, parseInt(p[2],10));
     return parseInt(p[1],10) + '月' + parseInt(p[2],10) + '日（' + WEEK[d.getDay()] + '）';
   }
+  function pad2(n){ return (n<10?'0':'') + n; }
+  function timeToMin(t){
+    if(!t) return null;
+    var p = String(t).split(':');
+    if(p.length<2) return null;
+    var h = parseInt(p[0],10), m = parseInt(p[1],10);
+    if(isNaN(h)||isNaN(m)) return null;
+    return h*60+m;
+  }
+  function dateToDayNum(key){
+    var p = String(key||'').split('-');
+    if(p.length!==3) return null;
+    return Math.round(Date.UTC(parseInt(p[0],10), parseInt(p[1],10)-1, parseInt(p[2],10)) / 86400000);
+  }
+  // その日の「ねた時刻」：自分で入力した時刻を優先。旧形式（自動記録）の記録は送信時刻（savedAt）を使う
+  function bedMomentMin(r){
+    var bm0 = timeToMin(r.bedtime);
+    var dn0 = dateToDayNum(r.date);
+    if(bm0 !== null && dn0 !== null){
+      var total0 = dn0*1440 + bm0;
+      // 深夜0〜5時に寝た場合は翌日扱い
+      if(bm0 < 300) total0 += 1440;
+      return { total: total0, label: r.bedtime };
+    }
+    if(r.bedtimeAuto){
+      var d = new Date(r.savedAt);
+      if(isNaN(d.getTime())) return null;
+      var parts = new Intl.DateTimeFormat('en-CA', {
+        timeZone:'Asia/Tokyo', year:'numeric', month:'2-digit', day:'2-digit',
+        hour:'2-digit', minute:'2-digit', hourCycle:'h23'
+      }).formatToParts(d);
+      var o = {};
+      parts.forEach(function(p){ o[p.type]=p.value; });
+      var dayNum = dateToDayNum(o.year + '-' + o.month + '-' + o.day);
+      if(dayNum===null) return null;
+      return { total: dayNum*1440 + (parseInt(o.hour,10)%24)*60 + parseInt(o.minute,10),
+               label: pad2(parseInt(o.hour,10)%24) + ':' + o.minute };
+    }
+    return null;
+  }
+  // あとから記入された「昨日のねた時刻」（prevBedtime）を時刻に変換
+  function prevBedMomentMin(r){
+    var bm = timeToMin(r.prevBedtime);
+    var dn = dateToDayNum(r.prevDate);
+    if(bm===null || dn===null) return null;
+    var total = dn*1440 + bm;
+    if(bm < 300) total += 1440;
+    return { total: total, label: r.prevBedtime };
+  }
+  // 前日（前後2日以内）の記録のねた時刻 → 今日の起きた時刻 で睡眠時間を計算
+  function sleepDurationFor(recordsAsc, idx){
+    var r = recordsAsc[idx];
+    var wakeMin = timeToMin(r.waketime);
+    var dayNum = dateToDayNum(r.date);
+    if(wakeMin===null || dayNum===null) return null;
+    var wakeTotal = dayNum*1440 + wakeMin;
+    // まず前日（前後2日以内）の記録自身のねた時刻を使う
+    for(var i=idx-1; i>=0; i--){
+      var prev = recordsAsc[i];
+      var pdn = dateToDayNum(prev.date);
+      if(pdn===null) continue;
+      if(dayNum - pdn > 2) break;
+      var bed = bedMomentMin(prev);
+      if(!bed) continue;
+      var diff = wakeTotal - bed.total;
+      if(diff > 0 && diff <= 24*60) return diff;
+    }
+    // 無ければ、今日あとから記入した「昨日のねた時刻」を使う
+    var pb = prevBedMomentMin(r);
+    if(pb){
+      var pdiff = wakeTotal - pb.total;
+      if(pdiff > 0 && pdiff <= 24*60) return pdiff;
+    }
+    return null;
+  }
+  function fmtDuration(mins){
+    var h = Math.floor(mins/60), m = mins % 60;
+    if(h && m) return h + '時間' + m + '分';
+    if(h) return h + '時間';
+    return m + '分';
+  }
+  function fmtHours(h){
+    var n = parseFloat(h);
+    if(isNaN(n)) return '';
+    if(n === 0.5) return '約30分';
+    if(n === 1.5) return '約1時間30分';
+    return '約' + n + '時間';
+  }
   function loadRecords(){
     try{
       var raw = localStorage.getItem(LS_KEY);
@@ -544,41 +706,49 @@ textarea{ min-height:88px; resize:vertical; line-height:1.6; font-weight:500; }
       return;
     }
     count.textContent = '全 ' + records.length + ' 件';
-    var sorted = records.slice().sort(function(a,b){
-      return (b.date + (b.savedAt||'')).localeCompare(a.date + (a.savedAt||''));
+    var asc = records.slice().sort(function(a,b){
+      return (a.date + (a.savedAt||'')).localeCompare(b.date + (b.savedAt||''));
     });
     var html = '';
-    sorted.forEach(function(r){
+    for(var idx = asc.length - 1; idx >= 0; idx--){
+      var r = asc[idx];
+      var bed = bedMomentMin(r);
       html += '<div class="day-card"><div class="day-top"><span class="day-date">' + esc(fmtDateLabel(r.date)) + '</span>'
         + '<span class="day-badges">'
         + (r.shift ? '<span class="day-shift">' + esc(r.shift) + '</span>' : '')
         + (r.itch ? '<span class="day-itch">かゆみ：' + esc(r.itch) + '</span>' : '')
         + '</span></div><div class="day-grid">';
       var rows = [
-        ['🌙 ねた', r.bedtime], ['☀️ 起きた', r.waketime],
+        ['☀️ 起きた', r.waketime],
         ['🌅 朝', r.breakfast], ['🍱 昼', r.lunch],
-        ['🌙 夜', r.dinner], ['🛁 おふろ', r.bathtime]
+        ['🌙 夜', r.dinner], ['🛁 おふろ', r.bathtime],
+        ['🌙 ねた', bed ? bed.label : '']
       ];
       var any = false;
       rows.forEach(function(row){
         if(row[1]){ any = true; html += '<div><span class="k">' + row[0] + '</span><span class="v">' + esc(row[1]) + '</span></div>'; }
       });
-      var napStartVal = r.napStart || r.napstart || '';
-      var napEndVal = r.napEnd || r.napend || '';
-      var hasNap = !!(napStartVal || napEndVal);
-      if(hasNap) any = true;
-      if(!any) html += '<div><span class="v" style="color:var(--ink-soft)">（この日はメモだけの記録だよ）</span></div>';
-      html += '</div>';
-      if(hasNap){
-        var napText = '';
+      // 仮眠：新形式は「約◯時間」、旧形式は開始〜終了時刻
+      var napText = '';
+      if(r.napHours){ napText = fmtHours(r.napHours); }
+      else if(r.napDid === 'yes'){ napText = 'した（時間は未記入）'; }
+      else{
+        var napStartVal = r.napStart || r.napstart || '';
+        var napEndVal = r.napEnd || r.napend || '';
         if(napStartVal && napEndVal) napText = napStartVal + '〜' + napEndVal;
         else if(napStartVal) napText = napStartVal + '〜';
-        else napText = '〜' + napEndVal;
-        html += '<div class="day-nap">💤 仮眠： ' + esc(napText) + '</div>';
+        else if(napEndVal) napText = '〜' + napEndVal;
       }
+      if(napText) any = true;
+      if(!any) html += '<div><span class="v" style="color:var(--ink-soft)">（この日はメモだけの記録だよ）</span></div>';
+      html += '</div>';
+      var dur = sleepDurationFor(asc, idx);
+      if(dur !== null) html += '<div class="day-sleep">🌙 睡眠時間： ' + esc(fmtDuration(dur)) + '（前日のねた時刻から計算）</div>';
+      if(r.prevBedtime) html += '<div class="day-prevbed">🌙 昨日のねた時刻： ' + esc(r.prevBedtime) + '（あとから記入）</div>';
+      if(napText) html += '<div class="day-nap">💤 仮眠： ' + esc(napText) + '</div>';
       if(r.notes) html += '<div class="day-note">📝 ' + esc(r.notes) + '</div>';
       html += '</div>';
-    });
+    }
     list.innerHTML = html;
   }
 
@@ -609,6 +779,54 @@ textarea{ min-height:88px; resize:vertical; line-height:1.6; font-weight:500; }
     chip.addEventListener('click', function(){ setTimeout(updateBathPraise, 0); });
   });
 
+  // 寝落ち対応：昨日の記録が無ければ、昨日の就寝時刻を聞くカードを出す
+  var catchupShown = false;
+  function dayNumToKey(dn){
+    var d = new Date(dn * 86400000);
+    return d.getUTCFullYear() + '-' + pad2(d.getUTCMonth()+1) + '-' + pad2(d.getUTCDate());
+  }
+  function yesterdayKey(){
+    var dn = dateToDayNum(todayKey());
+    return dn === null ? '' : dayNumToKey(dn - 1);
+  }
+  function checkCatchup(){
+    var card = document.getElementById('catchupCard');
+    if(!card) return;
+    var records = loadRecords();
+    var yk = yesterdayKey();
+    var show = false;
+    if(records.length && yk){
+      var hasYesterday = records.some(function(r){ return r && r.date === yk; });
+      var alreadyTold = records.some(function(r){ return r && r.prevDate === yk && r.prevBedtime; });
+      show = !hasYesterday && !alreadyTold;
+    }
+    catchupShown = show;
+    card.style.display = show ? '' : 'none';
+    if(show){
+      var lbl = document.getElementById('catchupDateLabel');
+      if(lbl) lbl.textContent = '昨日 ' + fmtDateLabel(yk);
+    }
+  }
+
+  // 仮眠：した／してないで時間入力欄の表示を切り替え
+  var formEl = document.getElementById('recordForm');
+  var napLenWrap = document.getElementById('napLenWrap');
+  var napHoursInput = document.getElementById('naphours');
+  function updateNapWrap(){
+    var sel = formEl.querySelector('input[name="napdid"]:checked');
+    var yes = sel && sel.value === 'yes';
+    if(napLenWrap) napLenWrap.classList.toggle('show', !!yes);
+    if(!yes && napHoursInput) napHoursInput.value = '';
+  }
+  formEl.querySelectorAll('input[name="napdid"]').forEach(function(radio){
+    radio.addEventListener('change', updateNapWrap);
+  });
+  document.querySelectorAll('.chip[data-nap]').forEach(function(chip){
+    chip.addEventListener('click', function(){
+      if(napHoursInput){ napHoursInput.value = chip.getAttribute('data-nap'); napHoursInput.focus(); }
+    });
+  });
+
   function splitTime(v){
     if(!v) return null;
     var p = v.split(':');
@@ -624,12 +842,17 @@ textarea{ min-height:88px; resize:vertical; line-height:1.6; font-weight:500; }
     btn.disabled = true;
     btn.textContent = '送信中… ♡';
 
-    var bedtime = document.getElementById('bedtime').value;
     var waketime = document.getElementById('waketime').value;
-    var napstartEl = document.getElementById('napstart');
-    var napendEl = document.getElementById('napend');
-    var napstart = napstartEl ? napstartEl.value : '';
-    var napend = napendEl ? napendEl.value : '';
+    var bedtime = document.getElementById('bedtime').value;
+    var prevBedEl = document.getElementById('prevBedtime');
+    var prevBedtime = (catchupShown && prevBedEl) ? prevBedEl.value : '';
+    var napDidEl = form.querySelector('input[name="napdid"]:checked');
+    var napDid = napDidEl ? napDidEl.value : '';
+    var napHours = '';
+    if(napDid === 'yes'){
+      var nh = parseFloat(document.getElementById('naphours').value);
+      if(!isNaN(nh) && nh > 0) napHours = String(nh);
+    }
     var breakfast = document.getElementById('breakfast').value.trim();
     var lunch = document.getElementById('lunch').value.trim();
     var dinner = document.getElementById('dinner').value.trim();
@@ -640,41 +863,48 @@ textarea{ min-height:88px; resize:vertical; line-height:1.6; font-weight:500; }
     var shiftEl = form.querySelector('input[name="shift"]:checked');
     var shift = shiftEl ? shiftEl.value : '';
 
-    // Googleフォームへ送信
+    // Googleフォームへ送信（就寝（予定）時刻・前日の就寝時刻は専用項目に送る）
     var params = new URLSearchParams();
     if(shift) params.append('entry.1383573100', shift);
-    var bt = splitTime(bedtime);
-    if(bt){ params.append('entry.1346526521_hour', bt.hour); params.append('entry.1346526521_minute', bt.minute); }
     var wt = splitTime(waketime);
     if(wt){ params.append('entry.1383552942_hour', wt.hour); params.append('entry.1383552942_minute', wt.minute); }
-    var ns = splitTime(napstart);
-    if(ns){ params.append('entry.1061209262_hour', ns.hour); params.append('entry.1061209262_minute', ns.minute); }
-    var ne = splitTime(napend);
-    if(ne){ params.append('entry.83942154_hour', ne.hour); params.append('entry.83942154_minute', ne.minute); }
+    if(napHours) params.append('entry.2052297895', fmtHours(napHours));
     if(breakfast) params.append('entry.1886603140', breakfast);
     if(lunch) params.append('entry.1673192626', lunch);
     if(dinner) params.append('entry.650651930', dinner);
     var bath = splitTime(bathtime);
     if(bath){ params.append('entry.177732940_hour', bath.hour); params.append('entry.177732940_minute', bath.minute); }
     if(itch) params.append('entry.1138608139', itch);
+    var bt = splitTime(bedtime);
+    if(bt){ params.append('entry.121403886_hour', bt.hour); params.append('entry.121403886_minute', bt.minute); }
+    var pbt = splitTime(prevBedtime);
+    if(pbt){ params.append('entry.398915445_hour', pbt.hour); params.append('entry.398915445_minute', pbt.minute); }
     if(notes) params.append('entry.1870937493', notes);
 
     function finish(){
-      // 端末内にも保存
+      // 端末内にも保存（ねた時刻は送信時刻＝savedAt）
+      var savedAtIso = new Date().toISOString();
       var records = loadRecords();
       records.push({
         date: todayKey(),
-        savedAt: new Date().toISOString(),
+        savedAt: savedAtIso,
         shift: shift,
-        bedtime: bedtime || '', waketime: waketime || '',
-        napStart: napstart || '', napEnd: napend || '',
+        bedtime: bedtime || '', bedtimeAuto: false,
+        prevBedtime: prevBedtime || '', prevDate: prevBedtime ? yesterdayKey() : '',
+        waketime: waketime || '',
+        napDid: napDid, napHours: napHours,
         breakfast: breakfast, lunch: lunch, dinner: dinner,
         bathtime: bathtime || '', itch: itch, notes: notes
       });
       saveRecords(records);
       renderHistory();
+      checkCatchup();
 
       // 完了画面
+      var bedParts = [];
+      if(bedtime) bedParts.push('🌙 今日のねた時刻： ' + bedtime + ' で記録したよ');
+      if(prevBedtime) bedParts.push('昨日のねた時刻（' + prevBedtime + '）も記録したよ');
+      document.getElementById('successBed').innerHTML = bedParts.map(esc).join('<br>');
       document.getElementById('praiseText').textContent = PRAISES[Math.floor(Math.random()*PRAISES.length)];
       document.getElementById('formWrap').classList.add('hidden');
       var sv = document.getElementById('successView');
@@ -714,12 +944,15 @@ textarea{ min-height:88px; resize:vertical; line-height:1.6; font-weight:500; }
   document.getElementById('againBtn').addEventListener('click', function(){
     form.reset();
     updateBathPraise();
+    updateNapWrap();
+    checkCatchup();
     document.getElementById('successView').classList.remove('show');
     document.getElementById('formWrap').classList.remove('hidden');
     window.scrollTo({ top:0, behavior:'smooth' });
   });
 
   renderHistory();
+  checkCatchup();
 })();
 </script>
 </body>
